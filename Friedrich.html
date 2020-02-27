@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>腓特烈/巴顿计算器 by wise1</title>
+    
+</head>
+
+<body>
+
+        <!-- Main Pages -->
+        <script>
+            function cal() {
+                var dmg_total = 0
+				var dmg_all = 0
+                var crit_base = parseFloat(document.getElementById('crit_base').value),             // 基础暴击率
+                    critdmg_base = parseFloat(document.getElementById('critdmg_base').value),       // 基础暴击伤害
+					hit_max = parseFloat(document.getElementById('hit_max').value), 				// 攻击次数
+					dmgup_base = parseFloat(document.getElementById('dmgup_base').value), 				// 全伤加成
+					boss_reduce = parseFloat(document.getElementById('boss_reduce').value), 				// 固有免伤
+					phy_base = parseFloat(document.getElementById('phy_base').value),     			// 已有物理伤害加成
+                    num_ran = parseInt(document.getElementById('num_ran').value),                 // 模拟次数					
+					num_notcrit = 0,            // 不暴击次数
+                    num_dmgbuff = 0,            // 暴击叠伤层数
+                    time_total = 0,             // 总时间
+                    time_buff = 0,              // 伤害增益结束时间
+                    crit = crit_base + 0.05,    // 实际暴击率
+                    num_critall = 0,            // 总暴击次数
+					time_max = 4 ,
+                    time_interval = time_max / hit_max,
+					expectation_base = (1 + crit_base * (critdmg_base - 1)) * (phy_base  +  1) * (1 + dmgup_base),
+                    fri_dmg = (1 + crit_base * (critdmg_base - 1)) * (phy_base  +  1) * (1 + dmgup_base +0.15 ) * ((1-boss_reduce + 0.15)/(1 - boss_reduce)),
+					i = 0 
+			 for (var h = 0; h < num_ran; h++) {
+				
+				dmg_total = 0
+				time_total = 0
+				time_buff = 0
+				num_dmgbuff = 0
+				num_notcrit = 0
+			    crit = crit_base + 0.05
+				time_interval = time_max / hit_max
+				i = 0
+				
+				
+				for (i = 0; i < hit_max; i++) {
+                    crit = crit_base + 0.05 + 0.02 * Math.min(10, num_notcrit)
+                    if (Math.random() < crit) { // 如果暴击
+                        num_critall++
+                        if (time_total > time_buff) { // 伤害buff消失
+                            num_dmgbuff = 0
+                        }
+                        num_dmgbuff = Math.min(3, num_dmgbuff + 1)  // 累加伤害层数
+                        dmg_total += critdmg_base * (1 + 0.05 * num_dmgbuff + 0.05 + phy_base)
+                        time_buff = time_total + 3       // 刷新伤害时间
+                        num_notcrit = 0
+                    } else {
+                        num_notcrit++
+                        if (time_total > time_buff) { // 伤害buff消失
+                            num_dmgbuff = 0
+                        }
+                        dmg_total += (1 + 0.05 * num_dmgbuff + 0.05 + phy_base)
+                    }
+                    time_total += time_interval // 计时
+					
+					}
+				
+					
+					dmg_all += dmg_total
+                }
+				dmg_all = dmg_all * (1+dmgup_base)
+                document.getElementById('result').innerHTML = '巴顿平均收益：' + (dmg_all / (expectation_base * num_ran * hit_max)-1)*100 +'%'  + '，巴顿平均暴击率加成：' + (num_critall / num_ran / hit_max - crit_base)*100 + '%<br>' + "腓特烈平均收益：" + (fri_dmg/expectation_base-1)*100 +'%<br>' + '腓特烈/巴顿提升比：' + ( (fri_dmg * num_ran * hit_max)/dmg_all -1)*100 +'%' 
+            }
+        </script>
+        <div id="page-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <h4>腓特烈巴顿计算器</h4>
+                        <h5>可计算腓特烈套与巴顿套爆发4秒周期伤害提升率</h5>
+                        <h5> </h5>
+                        <h5>*本结果为根据理论公式近似模拟结果，与实际数据可能存在出入。 </h5>
+                        <div class="form-group input-group" style="width:500px">
+                            <span class="input-group-addon">基础暴击率（取值0~1，凹暴击直接填1）<br> </span>
+                            <input type="text" class="form-control" placeholder="num" id="crit_base" value=0.3>
+                        </div>
+                        <div class="form-group input-group" style="width:500px">
+                            <span class="input-group-addon">基础暴击伤害（基础为2倍，比安卡2.3）<br> </span>
+                            <input type="text" class="form-control" placeholder="num" id="critdmg_base" value=2>
+                        </div>
+                        <div class="form-group input-group" style="width:500px">
+                            <span class="input-group-addon">4秒周期内伤害hit数（白毛1个球3 hit）<br> </span>
+                            <input type="text" class="form-control" placeholder="num" id="hit_max" value=27>
+                        </div>
+						<div class="form-group input-group" style="width:500px">
+                            <span class="input-group-addon">已有全伤伤害加成<br> </span>
+                            <input type="text" class="form-control" placeholder="num" id="dmgup_base" value=0.35>
+                        </div>
+						<div class="form-group input-group" style="width:500px">
+                            <span class="input-group-addon">已有物理伤害加成<br> </span>
+                            <input type="text" class="form-control" placeholder="num" id="phy_base" value=0.68>
+                        </div>						
+						<div class="form-group input-group" style="width:500px">
+                            <span class="input-group-addon">BOSS固有免伤剩余<br> （地狱囚笼为0.45，装甲型-0.2，超算闪电-0.1）<br> </span>
+                            <input type="text" class="form-control" placeholder="num" id="boss_reduce" value=0.15>
+                        </div>						
+						
+                        <div class="form-group input-group" style="width:500px">
+                            <span class="input-group-addon">模拟次数<br> </span>
+                            <input type="text" class="form-control" placeholder="num" id="num_ran" value=10000>
+                        </div>
+                        <p><button type="button" class="btn btn-warning" onclick="cal()" data-toggle="tab">计算</button></p>
+                        <p id="result">结果</p>
+						<p id="manual;">说明：<br>关于伤害加成/固有免伤等概念参考<a href="https://nga.178.com/read.php?tid=20435366" target="_blank" title=""  >[攻略/心得]伤害公式剖析与伤害分类  /<a href="https://nga.178.com/read.php?tid=20494664" target="_blank" title=""  > 易伤与减抗机制及腓特烈效果分析与测试 </p> 本工具部分代码来自: <a href="https://nga.178.com/read.php?tid=20557538" target="_blank" title=""  >巴顿四件套物理伤害收益(包括计算工具的github开源页)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+   
+</body>
+
+</html>
