@@ -74,7 +74,7 @@
 					dmg_all += dmg_total
                 }
 				dmg_all = dmg_all * (1+dmgup_base)
-                document.getElementById('result').innerHTML = '巴顿平均收益：' + (dmg_all / (expectation_base * num_ran * hit_max)-1)*100 +'%'  + '，巴顿平均暴击率加成：' + (num_critall / num_ran / hit_max - crit_base)*100 + '%<br>' + "腓特烈平均收益：" + (fri_dmg/expectation_base-1)*100 +'%<br>' + '腓特烈/巴顿提升比：' + ( (fri_dmg * num_ran * hit_max)/dmg_all -1)*100 +'%' 
+               document.getElementById('result').innerHTML = '巴顿总体收益：' + (dmg_all / (expectation_base * num_ran * hit_max)-1)*100 +'%'  + '，巴顿平均暴击率加成：' + (num_critall / num_ran / hit_max - crit_base)*100 + '%<br>' + "腓特烈总体收益：" + (fri_dmg/expectation_base-1)*100 +"腓特烈4套装效果收益：" + 100*(((1-boss_reduce + 0.15)/(1 - boss_reduce))-1) +'%<br>' + '腓特烈/巴顿提升比：' + ( (fri_dmg * num_ran * hit_max)/dmg_all -1)*100 +'%' 
             }
         </script>
         <div id="page-wrapper">
